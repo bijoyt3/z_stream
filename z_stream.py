@@ -9,7 +9,7 @@ from streamlit_echarts import st_pyecharts
 import plotly.express as px
 import numpy as np
 
-conn = sqlite3.connect('z_stream_home/listings_v4.db')
+conn = sqlite3.connect('listings_v4.db')
 
 # Master/Cleaned df
 all_ = pd.read_sql("select * from listings_v4", conn)
