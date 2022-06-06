@@ -9,6 +9,7 @@ from streamlit_echarts import st_pyecharts
 import plotly.express as px
 import numpy as np
 
+# Connect to sqlite database
 conn = sqlite3.connect('listings_v4.db')
 
 # Master/Cleaned df
@@ -30,6 +31,7 @@ st.info("Dataset Last Updated: {}".format(all_['LastUpdated'].head(1)[0]))
 st.title("🏠 Zillow Zestimate Analysis 🏠")
 st.caption("Brought to you by BJT Studios")
 
+# Sidebar text
 with st.sidebar:
     st.write("""
     ## About:
@@ -68,6 +70,7 @@ with st.sidebar:
 # Listings with >=10% positive ZDelta
 undervalued = all_.where(all_['ZDelta']/all_['ListedPrice'] >= .1).dropna()
 
+# Metrics Container
 st.write("#### Metrics")
 with st.container() as metrics:
     m_col1, m_col2, m_col3 = st.columns(3)
@@ -87,15 +90,13 @@ counts = all_.groupby('HomeType')['HomeType'].count().reset_index(name='count').
 avg_price = all_.groupby('HomeType')['ListedPrice'].mean().reset_index(name='avg').sort_values(by='avg', ascending=False)
 avg_price['avg'] = avg_price['avg'].div(1000).astype('int64')
 
+# Barcharts Container
 with st.container() as barcharts:
     b_col1, b_col2 = st.columns(2)
     with b_col1:
         count_bar = (
             Bar(
-                init_opts=opts.InitOpts(
-                animation_opts=opts.AnimationOpts(
-                    animation_delay=10000, animation_easing="elasticOut")
-                )
+                init_opts=opts.InitOpts()
             )
             .add_xaxis(counts['HomeType'].tolist())
             .add_yaxis("Number of Listings", counts['count'].tolist(), color='#011f4b')
@@ -119,7 +120,7 @@ with st.container() as barcharts:
 
         st_pyecharts(avg_bar, key="averageBar")
 
-# Create scattermapbox dataframe
+# Create scatter_mapbox dataframe
 scatter_df = all_[['latitude', 'longitude', 'ZDelta', 'Address', 'ListedPrice', 'Zestimate', 'HomeType']].copy()
 
 # Set labels for ZDelta from 1 to 5. 1 = negative, 2 through 5 is an even split between the number of records >= 0
@@ -137,9 +138,13 @@ conditions = [
 values = [1, 2, 3, 4, 5]
 scatter_df['zd_score'] = np.select(conditions, values)
 
-
-def create_smb(df):
-    fig = px.scatter_mapbox(df,
+# Scatter Mapbox Container
+st.info("")
+st.write("#### Listing Locations")
+st.caption("All listings visualized and sized by their ZDelta; the higher the ZDelta Score,"
+           " the more 'undervalued' a listing is")
+with st.container() as scattermap:
+    fig = px.scatter_mapbox(scatter_df,
                             lat="latitude", lon="longitude", color="zd_score", size="zd_score",
                             color_continuous_scale='rdylgn', size_max=10, zoom=9,
                             center={'lat': 39, 'lon': -77.5}, height=750, hover_name='Address',
@@ -164,17 +169,10 @@ def create_smb(df):
                           font_size=12,
                           font_family="Arial"
                       ))
-    return fig
 
-
-st.info("")
-st.write("#### Listing Locations")
-st.caption("All listings visualized and sized by their ZDelta; the higher the ZDelta Score,"
-           " the more 'undervalued' a listing is")
-with st.container() as scattermap:
-    fig = create_smb(scatter_df)
     st.plotly_chart(fig, use_container_width=True)
 
+# Search Listings Form
 st.info("")
 st.write("#### Search Listings")
 with st.form(key='searchListings') as search:
@@ -216,6 +214,7 @@ with st.form(key='searchListings') as search:
         st.success("Returned {} Listings".format(len(fig2['data'][0]['customdata'])))
         st.plotly_chart(fig2, use_container_width=True)
 
+# Display dataframes as AgGrid
 with st.container() as dataframes:
     with st.expander("All Listings"):
         gob = GridOptionsBuilder.from_dataframe(all_)
@@ -231,19 +230,20 @@ with st.container() as dataframes:
         st.caption("Number of Records: {}".format(len(undervalued)))
 
 
+# Balloons on click for download button
 def success():
     st.balloons()
 
 
 @st.cache
-def convert_df(df):
+def convert_df(df: pd.DataFrame):
     return df.to_csv().encode('utf-8')
 
 
 all_listings = convert_df(all_)
 uv_listings = convert_df(undervalued)
 
-# Export all listings as csv
+# Export dataframes as csv with download buttons
 with st.container() as download_buttons:
     l1_dcol1, l1_dcol2, l1_dcol3 = st.columns([3, 1, 3])
 
