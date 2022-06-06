@@ -169,6 +169,8 @@ def create_smb(df):
 
 st.info("")
 st.write("#### Listing Locations")
+st.caption("All listings visualized and sized by their ZDelta; the higher the ZDelta Score,"
+           " the more 'undervalued' a listing is")
 with st.container() as scattermap:
     fig = create_smb(scatter_df)
     st.plotly_chart(fig, use_container_width=True)
