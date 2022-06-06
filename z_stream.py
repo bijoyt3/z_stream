@@ -72,6 +72,7 @@ undervalued = all_.where(all_['ZDelta']/all_['ListedPrice'] >= .1).dropna()
 
 # Metrics Container
 st.write("#### Metrics")
+st.caption("High Level Market Trends")
 with st.container() as metrics:
     m_col1, m_col2, m_col3 = st.columns(3)
     with m_col1:
@@ -175,6 +176,7 @@ with st.container() as scattermap:
 # Search Listings Form
 st.info("")
 st.write("#### Search Listings")
+st.caption("Search Database for Listings")
 with st.form(key='searchListings') as search:
     hometypes = st.multiselect(label="Select a HomeType:", options=scatter_df.HomeType.unique(),
                                default=scatter_df.HomeType.unique(),
