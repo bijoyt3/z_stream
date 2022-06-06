@@ -4,7 +4,7 @@
 
 Streamlit application developed to visualize housing market trends in Fairfax County and Loudoun County 
 
-[screenshot](screenshots/zilstream_pic1.png)
+<img width="1277" alt="Stream_Screenshot" src="screenshots/zilstream_pic1.png">
 
 ## Data 
 
