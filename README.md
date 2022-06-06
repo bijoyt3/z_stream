@@ -10,8 +10,8 @@ Streamlit application developed to visualize housing market trends in Fairfax Co
 
 I used a few different graphic components to make this application:
 - [py_echarts](https://pyecharts.org/): Python wrapper for ECharts; used for the bar charts 
-- [plotly] (https://plotly.com/python/): Used for the map graphic 
-- [streamlit-aggrid] (https://pypi.org/project/streamlit-aggrid/): Used for the interactive dataframes
+- [plotly](https://plotly.com/python/): Used for the map graphic 
+- [streamlit-aggrid](https://pypi.org/project/streamlit-aggrid/): Used for the interactive dataframes
 
 ## Data 
 
